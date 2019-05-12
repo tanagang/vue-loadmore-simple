@@ -1,6 +1,6 @@
 {
   "name": "vue-loadmore-simple",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "基于vue开箱即用的全局组件下拉加载更多",
   "main": "index.js",
   "scripts": {
