@@ -1,4 +1,4 @@
-基于vue开箱即用的全局组件下拉加载更多
+基于vue开箱即用的全局组件上滑加载更多，下拉刷新
 ### 使用方法
 ```js
     首先安装：npm install vue-loadmore-simple -S
