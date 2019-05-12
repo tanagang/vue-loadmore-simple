@@ -1,7 +1,7 @@
 {
   "name": "vue-loadmore-simple",
   "version": "1.0.7",
-  "description": "基于vue开箱即用的全局组件下滑加载更多、下拉刷新",
+  "description": "基于vue开箱即用的全局组件下滑加载更多无限滚动、下拉刷新，可自定义无数据时的文案和图标（默认含有）",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
