@@ -36,7 +36,6 @@
     }
     </script>
 ```
-```
     # 参数如下：
     * :pageIndex：页码 （必选）
     * :pageSize：页的大小（必选）
@@ -47,7 +46,7 @@
     # 回调函数
     * @loadmore：下滑到底时的回调，回调中的参数是下一页的页码
     * @refresh：下拉刷新
-```
+    
 ***
 github链接
 [链接名称](https://github.com/tanagag/vue-loadmore-simple)
