@@ -1,7 +1,11 @@
 <template>
-  <div style="overflow:hidden;">
+  <div style="overflow:hidden;position:relative">
     <div id="loadMore" style="margin-top:-40px">
-      <div class="pull-wrap"><i class="loadmore-icon" v-if="state==3"></i><i :class="state==1 ? 'pull-arrow': state==2?' pull-arrow pull-toggle':''"></i><span class="pull-text">下拉刷新</span></div>
+      <div class="pull-wrap">
+        <i class="loadmore-icon" v-if="state==3"></i>
+        <i :class="state==1 ? 'pull-arrow': state==2?' pull-arrow pull-toggle':''"></i>
+        <span class="pull-text">下拉刷新</span>
+      </div>
       <slot></slot>
       <div class="loadmore-tip" id="loadTips" v-if="totalCount > 0 && totalCount >= pageSize">
         <i v-show="loadTips=='正在加载'" class="loadmore-icon"></i>
@@ -15,7 +19,7 @@
   </div>
 </template>
 <script>
-var clr,clr2;
+var clr, clr2;
 export default {
   props: {
     pageIndex: {
@@ -39,15 +43,15 @@ export default {
       default: "暂无数据"
     },
     openRefresh: {
-      type: [String,Boolean],
+      type: [String, Boolean],
       default: false
     }
   },
   data() {
     return {
       hasData: false,
-      isPull:false,
-      state:1,
+      isPull: false,//是否达到了松开坑新的临界点
+      state: 1,//1:下拉刷新，2：松开更新，3：更新中
       loadTips: "正在加载"
     };
   },
@@ -55,13 +59,16 @@ export default {
     pageIndex() {
       this.loadMore();
     },
-    totalCount(val, oldval) {
-      this.hasData = false;
-      if (val > 0) {
-        this.loadMore();
-      } else if (val == 0) {
-        this.hasData = true;
-      }
+    totalCount:{
+      handler(val, oldval) {
+        this.hasData = false;
+        if (val > 0) {
+          this.loadMore();
+        } else if (val == 0) {
+          this.hasData = true;
+        }
+      },
+      immediate: true
     }
   },
   methods: {
@@ -99,13 +106,13 @@ export default {
                 flag = false;
                 var size = totalCount - pageIndex * pageSize;
                 if (size > 0) {
-                  scope.$emit("loadmore",pageIndex + 1);
+                  scope.$emit("loadmore", pageIndex + 1);
                   resolve(true);
                 } else {
                   scope.loadTips = "没有更多数据了";
                   resolve(false);
                 }
-                clearTimeout(clr)
+                clearTimeout(clr);
               }
             }
           }, 1000);
@@ -119,65 +126,69 @@ export default {
         _startPos = 0,
         _transitionHeight = 0;
 
-      var scope = this
+      var scope = this;
       _element.addEventListener("touchstart",function(e) {
           _startPos = e.targetTouches[0].screenY;
           _element.style.transition = "transform 0s";
         },
-        false
+        { passive: false }//兼容ios等终端
       );
 
-      _element.addEventListener("touchmove",function(e) {   
+      _element.addEventListener("touchmove",function(e) {
+         
           var h = _element.getBoundingClientRect().top + 40;
-          if(h >= 40){
-             e.preventDefault()
-            _transitionHeight = (e.targetTouches[0].screenY - _startPos) * 0.3 | 0;
+          _transitionHeight =((e.targetTouches[0].screenY - _startPos) * 0.3) | 0;
+          //_transitionHeight >= 0 即可下拉
+          if (h >= 0 && _transitionHeight >= 0) {
             _element.style.transform = "translateY(" + _transitionHeight + "px)";
             if (_transitionHeight > 0 && _transitionHeight < 100) {
-              scope.state = 1
+              scope.state = 1;
               _refreshText.innerText = "下拉刷新";
-              scope.isPull = false
+              scope.isPull = false;
               if (_transitionHeight > 60) {
-                scope.state = 2
+                scope.state = 2;
                 _refreshText.innerText = "松开更新";
-                scope.isPull = true
+                scope.isPull = true;
               }
             }
           }
         },
-        {passive: false}
+        { passive: false }//兼容ios等终端
       );
+
       _element.addEventListener("touchend",function(e) {
           _element.style.transition = "transform 0.5s ease 0.1s";
           _element.style.transform = "translateY(0px)";
-           if(scope.isPull){
+          if (scope.isPull) {
             var h = _element.getBoundingClientRect().top + 40;
-            if(h >= 40){
-              scope.state = 3
+            _transitionHeight = e.changedTouches[0].screenY - _startPos;
+            //_transitionHeight >= 0 即可下拉
+            if (h >= 0 && _transitionHeight >= 0) {
+              scope.state = 3;
               _refreshText.innerText = "更新中";
               _element.style.transform = "translateY(40px)";
-              clr2 = setTimeout(function(){
-                scope.$emit("refresh",true)
-                 _element.style.transform = "translateY(0px)";
-                clearTimeout(clr2)
-              },1000)
-            }else{
-              scope.state = 1
-              _element.style.transform = "translateY(0px)";
+              clr2 = setTimeout(function() {
+                scope.$emit("refresh", true);
+                _element.style.transform = "translateY(0px)";
+                clearTimeout(clr2);
+              }, 1000);
+            } else {
+               scope.state = 1;
+               _element.style.transform = "translateY(0px)";
             }
           }
         },
-        false
+        { passive: false }//兼容ios等终端
       );
     }
   },
-  destroyed(){
-    clearTimeout(clr)
-    clearTimeout(clr2)
+  destroyed() {
+    clearTimeout(clr);
+    clearTimeout(clr2);
   },
   mounted() {
     //this.loadMore()
-    if(this.openRefresh==true||this.openRefresh=='true'){
+    if (this.openRefresh == true || this.openRefresh == "true") {
       this.refresh();
     }
   }
@@ -191,15 +202,16 @@ export default {
   height: 50px;
   line-height: 50px;
 }
-.pull-wrap{
+.pull-wrap {
   text-align: center;
+  width:100%;
 }
 .no-data-tip {
   text-align: center;
   padding-top: 36%;
 }
 .no-data-tip p {
-  font-size: 14px;
+  font-size: 16px;
   margin: 10px auto;
   color: #aaa;
   padding: 0;
@@ -249,16 +261,17 @@ export default {
   height: 40px;
   line-height: 40px;
 }
-.pull-arrow{
+.pull-arrow {
   vertical-align: -6px;
-  height:18px;
-  width:14px;
+  height: 18px;
+  width: 14px;
   display: inline-block;
-  background: url("data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE4LjEuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMjAxLjg5NCAyMDEuODk0IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyMDEuODk0IDIwMS44OTQ7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnPg0KCTxnPg0KCQk8cG9seWdvbiBzdHlsZT0iZmlsbDojMDEwMDAyOyIgcG9pbnRzPSIzMy43NjgsNjYuMDE5IDM5LjEwOCw3MS4yNjYgOTcuMTcxLDE0LjIwNCA5Ny4xNzEsMjAxLjg5NCAxMDQuNzE5LDIwMS44OTQgDQoJCQkxMDQuNzE5LDE0LjE5NCAxNjIuNzg2LDcxLjI2NiAxNjguMTI1LDY2LjAxOSAxMDAuOTQ3LDAgCQkiLz4NCgk8L2c+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8L3N2Zz4NCg==") no-repeat;
-  margin:0 5px;
+  background: url("data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE4LjEuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMjAxLjg5NCAyMDEuODk0IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyMDEuODk0IDIwMS44OTQ7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnPg0KCTxnPg0KCQk8cG9seWdvbiBzdHlsZT0iZmlsbDojMDEwMDAyOyIgcG9pbnRzPSIzMy43NjgsNjYuMDE5IDM5LjEwOCw3MS4yNjYgOTcuMTcxLDE0LjIwNCA5Ny4xNzEsMjAxLjg5NCAxMDQuNzE5LDIwMS44OTQgDQoJCQkxMDQuNzE5LDE0LjE5NCAxNjIuNzg2LDcxLjI2NiAxNjguMTI1LDY2LjAxOSAxMDAuOTQ3LDAgCQkiLz4NCgk8L2c+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8L3N2Zz4NCg==")
+    no-repeat;
+  margin: 0 5px;
   transition: all 0.3s ease;
 }
-.pull-toggle{
+.pull-toggle {
   vertical-align: -2px;
   transform: rotate(180deg);
 }
