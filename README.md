@@ -1,40 +1,46 @@
 基于vue开箱即用的全局组件上滑无限滚动加载更多、下拉刷新
 ### 使用方法
-``` js
-    首先安装：npm install vue-loadmore-simple -S
-    //main.js
-    import {LoadMore} from 'vue-loadmore-simple'
-    Vue.use(LoadMore)
-    //template
-    <template>
-        <load-more :pageIndex="pageIndex" :pageSize="pageSize" :totalCount="totalCount" @loadmore="loadmore" :openRefresh="true"  @refresh="refresh">
-            <div>
-                <div v-for="(item,index) in list" :key="index">
-                    ...
-                </div>
-            </div>
-        </load-more>
-    </template>
-    <script>
-    export default {
-        data() {
-            return {
-                pageIndex: 1,
-                pageSize: 10,
-                totalCount: -1 //默认给-1
-            }
+首先安装：npm install vue-loadmore-simple -S
+```javascript
+//main.js
+import {LoadMore} from 'vue-loadmore-simple'
+Vue.use(LoadMore)
+//template
+<template>
+    <load-more 
+        :pageIndex="pageIndex" 
+        :pageSize="pageSize" 
+        :totalCount="totalCount" 
+        :openRefresh="true"
+        @refresh="refresh"
+        @loadmore="loadmore">
+
+        <div v-for="(item,index) in list" :key="index">
+            ...
+        </div>
+        
+    </load-more>
+</template>
+<script>
+export default {
+    data() {
+        return {
+            pageIndex: 1,
+            pageSize: 10,
+            totalCount: -1 //默认给-1
+        }
+    },
+    methods:{
+        loadmore(pageIndex){
+            this.pageIndex = pageIndex
+            this.getList();
         },
-        methods:{
-            loadmore(pageIndex){
-                this.pageIndex = pageIndex
-                this.getList();
-            },
-            refresh(){
-                console.log('您下拉刷新了')
-            }
-        },
-    }
-    </script>
+        refresh(){
+            console.log('您下拉刷新了')
+        }
+    },
+}
+</script>
 ```
 ### 参数如下
   *  :pageIndex：页码 （必选）
