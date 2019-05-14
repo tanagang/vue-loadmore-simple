@@ -3,7 +3,7 @@
     <div id="loadMore" style="margin-top:-40px">
       <div class="pull-wrap">
         <i class="loadmore-icon" v-if="state==3"></i>
-        <i :class="state==1 ? 'pull-arrow': state==2?'pull-arrow pull-toggle':''"></i>
+        <i :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i>
         <span class="pull-text">下拉刷新</span>
       </div>
       <slot></slot>
