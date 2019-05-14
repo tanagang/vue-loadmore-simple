@@ -172,11 +172,11 @@ export default {
                 scope.$emit("refresh", true);
                 _element.style.transform = "translateY(0px)";
                 clearTimeout(clr2);
-              }, 1500);
+              }, 600);
               clr3 = setTimeout(function() {
                 _refreshWrap.style.transform = "rotateX(90deg)"
                 clearTimeout(clr3);
-              }, 1800);
+              }, 800);
             } else {
                scope.state = 1;
                //_element.style.transform = "translateY(0px)";
