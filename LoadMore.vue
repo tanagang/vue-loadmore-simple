@@ -130,16 +130,17 @@ export default {
       var scope = this;
       _element.addEventListener("touchstart",function(e) {
           _startPos = e.targetTouches[0].screenY;
-          _element.style.transition = "transform 0s";
+          _element.style.transition = "transform 0s linear";
         },
         { passive: false }//兼容ios等终端
       );
 
       _element.addEventListener("touchmove",function(e) {
           var h = _element.getBoundingClientRect().top + 40;
-          _transitionHeight =((e.targetTouches[0].screenY - _startPos) * 0.3) | 0;
+          _transitionHeight =((e.targetTouches[0].screenY - _startPos) * 0.2) | 0;
           //_transitionHeight >= 0 即可下拉
           if (h >= 0 && _transitionHeight >= 0) {
+            e.preventDefault()
             _refreshWrap.style.transform = "rotateX(0deg)"
             _element.style.transform = "translateY(" + _transitionHeight + "px)"
             if (_transitionHeight > 0 && _transitionHeight < 100) {
@@ -276,6 +277,7 @@ export default {
   text-align: center;
   color: #aaa;
   height: 40px;
+  font-size:14px;
   line-height: 40px;
 }
 .pull-arrow {
