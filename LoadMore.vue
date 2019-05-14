@@ -8,7 +8,7 @@
       </div>
       <slot></slot>
       <div class="loadmore-tip" id="loadTips" v-if="totalCount > 0 && totalCount >= pageSize">
-        <i v-show="loadTips=='正在加载'" class="loadmore-icon"></i>
+        <i v-show="loadTips=='正在加载中'" class="loadmore-icon"></i>
         {{loadTips}}
       </div>
       <div v-if="hasData" class="no-data-tip">
@@ -52,7 +52,7 @@ export default {
       hasData: false,
       isPull: false,//是否达到了松开坑新的临界点
       state: 1,//1:下拉刷新，2：松开更新，3：更新中
-      loadTips: "正在加载"
+      loadTips: "正在加载中"
     };
   },
   watch: {
@@ -75,7 +75,7 @@ export default {
     //上滑动加载更多
     loadMore() {
       var scope = this;
-      scope.loadTips = "正在加载";
+      scope.loadTips = "正在加载中";
       let flag = true;
       let pageSize = this.pageSize;
       let pageIndex = this.pageIndex;
@@ -115,7 +115,7 @@ export default {
                 clearTimeout(clr);
               }
             }
-          }, 1000);
+          }, 1500);
         };
       });
     },
@@ -166,7 +166,7 @@ export default {
             //_transitionHeight >= 0 即可下拉
             if (h >= 0 && _transitionHeight >= 0) {
               scope.state = 3;
-              _refreshText.innerText = "更新中";
+              _refreshText.innerText = "正在刷新中";
               _element.style.transform = "translateY(40px)";
               clr2 = setTimeout(function() {
                 scope.$emit("refresh", true);
