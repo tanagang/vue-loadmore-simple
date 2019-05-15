@@ -1,6 +1,6 @@
 <template>
-  <div style="position:relative;">
-    <div id="loadMore" style="margin-top:-40px">
+  <div id="loadContainer" style="position:relative;overflow-y:hidden;">
+    <div id="loadMore" style="margin-top:-40px;">
       <div class="pull-wrap">
         <i class="loadmore-icon" v-if="state==3"></i>
         <i :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i>
@@ -19,7 +19,7 @@
   </div>
 </template>
 <script>
-var clr, clr2,clr3,clr4;
+var clr, clr2 ,clr3;
 export default {
   props: {
     pageIndex: {
@@ -115,7 +115,7 @@ export default {
                 clearTimeout(clr);
               }
             }
-          }, 1500);
+          }, 600);
         };
       });
     },
@@ -123,7 +123,8 @@ export default {
     refresh() {
       var _element = document.getElementById("loadMore"),
         _refreshText = document.querySelector(".pull-text"),
-        _refreshWrap = document.querySelector(".pull-wrap"),
+        _loadContainer = document.getElementById("loadContainer"),
+        windowH = document.documentElement.clientHeight || document.body.clientHeight,
         _startPos = 0,
         _transitionHeight = 0;
 
@@ -141,7 +142,10 @@ export default {
           //_transitionHeight >= 0 即可下拉
           if (h >= 0 && _transitionHeight >= 0) {
             e.preventDefault()
-            _refreshWrap.style.transform = "rotateX(0deg)"
+            //下拉时增加loadContainer的高度，否则会因为overflow-y:hidden造成视觉体验
+            if(_loadContainer.offsetHeight < windowH){
+              _loadContainer.style.height = '100vh'
+            } 
             _element.style.transform = "translateY(" + _transitionHeight + "px)"
             if (_transitionHeight > 0 && _transitionHeight < 100) {
               scope.state = 1;
@@ -170,28 +174,24 @@ export default {
               _refreshText.innerText = "正在刷新中";
               _element.style.transform = "translateY(40px)";
               clr2 = setTimeout(function() {
-                scope.$emit("refresh", true);
                 _element.style.transform = "translateY(0px)";
                 clearTimeout(clr2);
-              }, 600);
+              }, 1000);
+              //还原loadContainer的高度
               clr3 = setTimeout(function() {
-                _refreshWrap.style.transform = "rotateX(90deg)"
-                clearTimeout(clr3);
-              }, 800);
+                scope.$emit("refresh", true);
+                _loadContainer.style.height = 'auto'
+              }, 1500);
             } else {
                scope.state = 1;
                //_element.style.transform = "translateY(0px)";
             }
-          }else{
-            _element.style.transform = "translateY(0px)";
-            clr4 =setTimeout(function(){
-              _refreshWrap.style.transform = "rotateX(90deg)"
-              clearTimeout(clr4);
-            },600)
             
+          }else{
+            _element.style.transform = "translateY(0px)"; 
           }
         },
-        { passive: false }//兼容ios等终端
+        { passive: false }//兼容ios等终端..
       );
     }
   },
@@ -199,7 +199,6 @@ export default {
     clearTimeout(clr);
     clearTimeout(clr2);
     clearTimeout(clr3);
-    clearTimeout(clr4);
   },
   mounted() {
     //this.loadMore()
@@ -218,10 +217,6 @@ export default {
   line-height: 50px;
 }
 .pull-wrap {
-  -webkit-transform: rotateX(90deg);
-  transform: rotateX(90deg);
-  -webkit-transition: all 0.1s ease;
-  transition: all 0.1s ease;
   text-align: center;
   width:100%;
 }
