@@ -115,7 +115,7 @@ export default {
                 clearTimeout(clr);
               }
             }
-          }, 1500);
+          }, 600);
         };
       });
     },
