@@ -137,7 +137,7 @@ export default {
 
       _element.addEventListener("touchmove",function(e) {
           var h = _element.getBoundingClientRect().top + 40;
-          _transitionHeight =((e.targetTouches[0].screenY - _startPos) * 0.2) | 0;
+          _transitionHeight =((e.targetTouches[0].screenY - _startPos) * 0.3) | 0;
           //_transitionHeight >= 0 即可下拉
           if (h >= 0 && _transitionHeight >= 0) {
             e.preventDefault()
