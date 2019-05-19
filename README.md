@@ -1,6 +1,6 @@
 基于vue开箱即用的全局组件上滑无限滚动加载更多、下拉刷新
 ### 使用方法
-首先安装：npm install vue-loadmore-simple -S
+首先项目中安装：npm install vue-loadmore-simple -S
 ```javascript
 //main.js
 import {LoadMore} from 'vue-loadmore-simple'
@@ -24,6 +24,7 @@ Vue.use(LoadMore)
 <script>
 export default {
     data() {
+        //注意：当有切换tab或者刷选等功能时，totalCount要初始化为-1，pageIndex要初始化为1
         return {
             pageIndex: 1,
             pageSize: 10,
@@ -32,8 +33,8 @@ export default {
     },
     methods:{
         loadmore(pageIndex){
-            this.pageIndex = pageIndex
-            this.getList();
+            //上滑加载更多，pageIndex为下一页页码
+            console.log('加载更多中...')
         },
         refresh(){
             console.log('您下拉刷新了')
