@@ -1,5 +1,7 @@
-基于vue开箱即用的全局组件上滑无限滚动加载更多、下拉刷新
-![](https://file.40017.cn/tcyp/tz/refresh.gif)
+基于vue开箱即用的全局组件上滑无限滚动加载更多、下拉刷新  
+  
+  ![](https://file.40017.cn/tcyp/tz/refresh.gif)
+
 ### 使用方法
 首先项目中安装：npm install vue-loadmore-simple -S
 ```javascript
