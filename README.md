@@ -1,5 +1,6 @@
 基于vue开箱即用的全局组件上滑无限滚动加载更多、下拉刷新  
-下图gif可能有卡顿
+下图gif可能有卡顿  
+
   ![](https://file.40017.cn/tcyp/tz/refresh2.gif)
 
 ### 使用方法
