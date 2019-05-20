@@ -46,9 +46,11 @@ export default {
     },
 }
 </script>
-<font color="green"> 注意：当含有上图gif中tab切换或者筛选功能时，请初始化this.totalCount=-1;this.pageIndex=1 </font>
+
 ```
-<font color="green"> 注意：当含有上图gif中tab切换或者筛选功能时，请初始化this.totalCount=-1;this.pageIndex=1 </font>
+```diff
+- 注意：当含有上图gif中tab切换或者筛选功能时，请初始化this.totalCount=-1;this.pageIndex=1 
+```
 ### 参数如下
   *  :pageIndex：页码 （必选）
   *  :pageSize：页的大小（必选）
