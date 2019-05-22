@@ -1,7 +1,7 @@
 基于vue开箱即用的全局组件上滑无限滚动加载更多、下拉刷新  
 下图gif可能有卡顿，[图片原地址](https://file.40017.cn/tcyp/tz/refresh2.gif)  
 ```diff
-+走过路过star一下
++ 若实用就来个star鼓励下
 ```
 
   ![](https://file.40017.cn/tcyp/tz/refresh2.gif)
