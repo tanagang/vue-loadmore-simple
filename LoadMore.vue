@@ -1,17 +1,15 @@
 ﻿<template>
   <div id="loadContainer" style="position:relative;overflow-y:hidden;">
-    <div id="loadMore" style="margin-top:-40px;">
-      <div class="pull-wrap">
+    <div id="loadMore">
+      <div class="pull-wrap"  style="margin-top:-40px;">
         <i class="loadmore-icon" v-if="state==3"></i>
         <i :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i>
         <span class="pull-text">下拉刷新</span>
       </div>
       <slot></slot>
-      <div class="loadmore-tip" id="loadTips" v-if="totalCount > 0 && totalCount >= pageSize ">
-        <template v-show="pageIndex>1">
-          <i v-show="loadTips=='正在加载中'" class="loadmore-icon"></i>
-          {{loadTips}}
-        </template>
+      <div class="loadmore-tip" id="loadTips" v-if="totalCount > 0 && totalCount >= pageSize">
+        <i v-show="loadTips=='正在加载中'" class="loadmore-icon"></i>
+        {{loadTips}}
       </div>
       <div v-if="hasData" class="no-data-tip">
         <img :src="tipsSrc">
@@ -141,9 +139,10 @@ export default {
       _element.addEventListener("touchmove",function(e) {
           var h = _element.getBoundingClientRect().top + 40;
           _transitionHeight =((e.targetTouches[0].screenY - _startPos) * 0.3) | 0;
-          //_transitionHeight >= 0 即可下拉
           if (h >= 0 && _transitionHeight >= 0) {
-            e.preventDefault()
+            if (typeof event.cancelable !== 'boolean' || event.cancelable) {
+              event.preventDefault();
+            }
             //下拉时增加loadContainer的高度，否则会因为overflow-y:hidden造成视觉体验
             if(_loadContainer.offsetHeight < windowH){
               _loadContainer.style.height = '100vh'
@@ -165,12 +164,12 @@ export default {
       );
 
       _element.addEventListener("touchend",function(e) {
-          _element.style.transition = "transform 0.2s ease 0.1s";
+          _element.style.transition = "transform 0.3s ease 0.1s";
           _element.style.transform = "translateY(0px)";
+          
           if (scope.isPull) {
             var h = _element.getBoundingClientRect().top + 40;
             _transitionHeight = e.changedTouches[0].screenY - _startPos;
-            //_transitionHeight >= 0 即可下拉
             if (h >= 0 && _transitionHeight >= 0) {
               scope.state = 3;
               _refreshText.innerText = "正在刷新中";
@@ -186,10 +185,10 @@ export default {
               }, 1500);
             } else {
                scope.state = 1;
-               //_element.style.transform = "translateY(0px)";
+               _element.style.transform = "translateY(0px)";
             }
-            
           }else{
+            _loadContainer.style.height = 'auto'
             _element.style.transform = "translateY(0px)"; 
           }
         },
