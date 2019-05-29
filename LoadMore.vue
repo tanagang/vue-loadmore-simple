@@ -1,4 +1,4 @@
-﻿<template>
+<template>
   <div id="loadContainer" style="position:relative;overflow-y:hidden;">
     <div id="loadMore">
       <div class="pull-wrap"  style="margin-top:-40px;">
