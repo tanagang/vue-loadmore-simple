@@ -1,6 +1,6 @@
 <template>
   <div id="loadContainer" style="position:relative;overflow-y:hidden;">
-    <div id="loadMore">
+    <div id="loadMore" @touchstart="touchstart($event)" @touchmove="touchmove($event)" @touchend="touchend($event)">
       <div class="pull-wrap"  style="margin-top:-40px;">
         <i class="loadmore-icon" v-if="state==3"></i>
         <i :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i>
@@ -121,79 +121,78 @@ export default {
     },
     //下拉刷新
     refresh() {
-      var _element = document.getElementById("loadMore"),
-        _refreshText = document.querySelector(".pull-text"),
-        _loadContainer = document.getElementById("loadContainer"),
-        windowH = document.documentElement.clientHeight || document.body.clientHeight,
-        _startPos = 0,
-        _transitionHeight = 0;
+        this._refreshText = document.querySelector(".pull-text"),
+        this._startPos = 0,
+        this._transitionHeight = 0
+        this.obj = document.getElementById("loadMore")
 
-      var scope = this;
-      _element.addEventListener("touchstart",function(e) {
-          _startPos = e.targetTouches[0].screenY;
-          _element.style.transition = "transform 0s linear";
-        },
-        { passive: false }//兼容ios等终端
-      );
+        this.windowHeight = document.documentElement.clientHeight||document.body.clientHeight
+        this.loadContainer = document.getElementById("loadContainer")
+        this.loadContainerHeight = this.loadContainer.offsetHeight
+    },
+    touchstart(event){
+      //alert(this.openRefresh)
+      if (!this.openRefresh&&this.openRefresh!="true") {
+        return;
+      }
+      this._startPos = event.targetTouches[0].screenY
+      this.obj.style.transition = "transform 0s linear"
+    },
+    touchmove(event){
+      if (!this.openRefresh&&this.openRefresh!="true") {
+        return;
+      }
+      var h = this.obj.getBoundingClientRect().top;
+      this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.3) | 0;
+      if (h >= 0 && this._transitionHeight >= 0) {
+        if (typeof event.cancelable !== 'boolean' || event.cancelable) {
+          event.preventDefault();
+        }
+        
+        if(this.loadContainerHeight<=this.windowHeight){
+          this.loadContainer.style.cssText = `height:${this.loadContainerHeight+this._transitionHeight}px;`
+        }
 
-      _element.addEventListener("touchmove",function(e) {
-          var h = _element.getBoundingClientRect().top + 40;
-          _transitionHeight =((e.targetTouches[0].screenY - _startPos) * 0.3) | 0;
-          if (h >= 0 && _transitionHeight >= 0) {
-            if (typeof event.cancelable !== 'boolean' || event.cancelable) {
-              event.preventDefault();
-            }
-            //下拉时增加loadContainer的高度，否则会因为overflow-y:hidden造成视觉体验
-            if(_loadContainer.offsetHeight < windowH){
-              _loadContainer.style.height = '100vh'
-            } 
-            _element.style.transform = "translateY(" + _transitionHeight + "px)"
-            if (_transitionHeight > 0 && _transitionHeight < 100) {
-              scope.state = 1;
-              _refreshText.innerText = "下拉刷新";
-              scope.isPull = false;
-              if (_transitionHeight > 50) {
-                scope.state = 2;
-                _refreshText.innerText = "松开更新";
-                scope.isPull = true;
-              }
-            }
+        this.obj.style.transform = "translateY(" + this._transitionHeight + "px)"
+        if (this._transitionHeight > 0 && this._transitionHeight < 100) {
+          this.state = 1;
+          this._refreshText.innerText = "下拉刷新";
+          this.isPull = false;
+          if (this._transitionHeight > 50) {
+            this.state = 2;
+            this._refreshText.innerText = "松开更新";
+            this.isPull = true;
           }
-        },
-        { passive: false }//兼容ios等终端
-      );
-
-      _element.addEventListener("touchend",function(e) {
-          _element.style.transition = "transform 0.3s ease 0.1s";
-          _element.style.transform = "translateY(0px)";
-          
-          if (scope.isPull) {
-            var h = _element.getBoundingClientRect().top + 40;
-            _transitionHeight = e.changedTouches[0].screenY - _startPos;
-            if (h >= 0 && _transitionHeight >= 0) {
-              scope.state = 3;
-              _refreshText.innerText = "正在刷新中";
-              _element.style.transform = "translateY(40px)";
-              clr2 = setTimeout(function() {
-                _element.style.transform = "translateY(0px)";
-                clearTimeout(clr2);
-              }, 1000);
-              //还原loadContainer的高度
-              clr3 = setTimeout(function() {
-                scope.$emit("refresh", true);
-                _loadContainer.style.height = 'auto'
-              }, 1500);
-            } else {
-               scope.state = 1;
-               _element.style.transform = "translateY(0px)";
-            }
-          }else{
-            _loadContainer.style.height = 'auto'
-            _element.style.transform = "translateY(0px)"; 
-          }
-        },
-        { passive: false }//兼容ios等终端..
-      );
+        }
+      }
+    },
+    touchend(event){
+      if (!this.openRefresh&&this.openRefresh!="true") {
+        return;
+      }
+      this.obj.style.cssText = `transition:transform 0.3s ease 0.1s;transform:translateY(0)`
+      this.loadContainer.style.height = "auto"
+      if (this.isPull) {
+        var h = this.obj.getBoundingClientRect().top;
+        this._transitionHeight = event.changedTouches[0].screenY - this._startPos;
+        if (h >= 0 && this._transitionHeight >= 0) {
+          this.state = 3;
+          this._refreshText.innerText = "正在刷新中";
+          this.obj.style.transform = "translateY(40px)";
+          clr2 = setTimeout(()=> {
+            this.obj.style.transform = "translateY(0)";
+            clearTimeout(clr2);
+          }, 1000);
+          clr3 = setTimeout(()=> {
+            this.$emit("refresh", true);
+          }, 1500);
+        } else {
+            this.state = 1;
+            this.obj.style.transform = "translateY(0)";
+        }
+      }else{
+        this.obj.style.transform = "translateY(0)"; 
+      }
     }
   },
   destroyed() {
