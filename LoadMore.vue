@@ -1,7 +1,7 @@
 <template>
   <div id="loadContainer" style="position:relative;overflow-y:hidden;">
     <div id="loadMore" @touchstart="touchstart($event)" @touchmove="touchmove($event)" @touchend="touchend($event)">
-      <div class="pull-wrap"  style="margin-top:-40px;">
+      <div class="pull-wrap" v-if="openRefresh||openRefresh=='true'"  style="margin-top:-40px;">
         <i class="loadmore-icon" v-if="state==3"></i>
         <i :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i>
         <span class="pull-text">下拉刷新</span>
@@ -19,7 +19,7 @@
   </div>
 </template>
 <script>
-var clr, clr2 ,clr3;
+var clr, clr2 ,clr3,clr4;
 export default {
   props: {
     pageIndex: {
@@ -125,16 +125,14 @@ export default {
         this._startPos = 0,
         this._transitionHeight = 0
         this.obj = document.getElementById("loadMore")
-
         this.windowHeight = document.documentElement.clientHeight||document.body.clientHeight
-        this.loadContainer = document.getElementById("loadContainer")
-        this.loadContainerHeight = this.loadContainer.offsetHeight
     },
     touchstart(event){
-      //alert(this.openRefresh)
       if (!this.openRefresh&&this.openRefresh!="true") {
         return;
       }
+      this.loadContainer = document.getElementById("loadContainer")
+      this.loadContainerHeight = this.loadContainer.offsetHeight
       this._startPos = event.targetTouches[0].screenY
       this.obj.style.transition = "transform 0s linear"
     },
@@ -142,15 +140,16 @@ export default {
       if (!this.openRefresh&&this.openRefresh!="true") {
         return;
       }
-      var h = this.obj.getBoundingClientRect().top;
-      this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.3) | 0;
+      var h = this.obj.getBoundingClientRect().top + 40
+      this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.3) | 0
       if (h >= 0 && this._transitionHeight >= 0) {
         if (typeof event.cancelable !== 'boolean' || event.cancelable) {
           event.preventDefault();
         }
         
         if(this.loadContainerHeight<=this.windowHeight){
-          this.loadContainer.style.cssText = `height:${this.loadContainerHeight+this._transitionHeight}px;`
+          let temph = this.loadContainerHeight+this._transitionHeight
+          this.loadContainer.style.height = temph + 'px'
         }
 
         this.obj.style.transform = "translateY(" + this._transitionHeight + "px)"
@@ -170,10 +169,13 @@ export default {
       if (!this.openRefresh&&this.openRefresh!="true") {
         return;
       }
-      this.obj.style.cssText = `transition:transform 0.3s ease 0.1s;transform:translateY(0)`
-      this.loadContainer.style.height = "auto"
+      this.obj.style.cssText = `transition:transform 0.3s ease 0.1s;transform:translateY(0);`
+      clearTimeout(clr4)
+      clr4 = setTimeout(()=>{
+        this.loadContainer.style.height = "auto"
+      },1500)
       if (this.isPull) {
-        var h = this.obj.getBoundingClientRect().top;
+        var h = this.obj.getBoundingClientRect().top + 40
         this._transitionHeight = event.changedTouches[0].screenY - this._startPos;
         if (h >= 0 && this._transitionHeight >= 0) {
           this.state = 3;
@@ -188,10 +190,10 @@ export default {
           }, 1500);
         } else {
             this.state = 1;
-            this.obj.style.transform = "translateY(0)";
+            this.obj.style.transform = "translateY(0)"
         }
       }else{
-        this.obj.style.transform = "translateY(0)"; 
+        this.obj.style.transform = "translateY(0)"
       }
     }
   },
@@ -199,6 +201,7 @@ export default {
     clearTimeout(clr);
     clearTimeout(clr2);
     clearTimeout(clr3);
+    clearTimeout(clr4);
   },
   mounted() {
     //this.loadMore()
