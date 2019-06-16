@@ -125,6 +125,7 @@ export default {
         this._startPos = 0,
         this._transitionHeight = 0
         this.obj = document.getElementById("loadMore")
+        this.loadContainerTop = document.getElementById("loadContainer").offsetTop
         this.windowHeight = document.documentElement.clientHeight||document.body.clientHeight
     },
     touchstart(event){
@@ -140,9 +141,9 @@ export default {
       if (!this.openRefresh&&this.openRefresh!="true") {
         return;
       }
-      var h = this.obj.getBoundingClientRect().top + 40
+      var h = Math.ceil(this.obj.getBoundingClientRect().top + 40)
       this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.3) | 0
-      if (h >= 0 && this._transitionHeight >= 0) {
+      if (h>=this.loadContainerTop&&this._transitionHeight >= 0) {
         if (typeof event.cancelable !== 'boolean' || event.cancelable) {
           event.preventDefault();
         }
@@ -175,9 +176,9 @@ export default {
         this.loadContainer.style.height = "auto"
       },1500)
       if (this.isPull) {
-        var h = this.obj.getBoundingClientRect().top + 40
+        var h = Math.ceil(this.obj.getBoundingClientRect().top + 40)
         this._transitionHeight = event.changedTouches[0].screenY - this._startPos;
-        if (h >= 0 && this._transitionHeight >= 0) {
+        if (h>=this.loadContainerTop&&this._transitionHeight >= 0) {
           this.state = 3;
           this._refreshText.innerText = "正在刷新中";
           this.obj.style.transform = "translateY(40px)";
@@ -206,7 +207,9 @@ export default {
   mounted() {
     //this.loadMore()
     if (this.openRefresh == true || this.openRefresh == "true") {
-      this.refresh();
+      this.$nextTick(()=>{
+        this.refresh()
+      })
     }
   }
 };
