@@ -40,7 +40,8 @@ export default {
     },
     methods:{
         loadmore(pageIndex){
-            //上滑加载更多，pageIndex为下一页页码
+            //上滑加载更多，pageIndex为下一页页码,
+            this.pageIndex++
             console.log('加载更多中...')
         },
         refresh(){
