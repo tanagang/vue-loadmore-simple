@@ -1,5 +1,5 @@
 import LoadMoreComponent from './LoadMore.vue'
-const LoadMore = {
+var LoadMore = {
 	install:function(Vue,options){
 		Vue.component('loadMore',LoadMoreComponent)
 	}
