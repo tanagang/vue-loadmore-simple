@@ -53,7 +53,7 @@ export default {
 
 ```
 ```diff
-- 注意：当含有上图gif中tab切换或者筛选功能时，请初始化this.totalCount=-1;this.pageIndex=1 
+- 注意：当含有上图gif中tab切换或者筛选功能时，请初始化this.totalCount=0;this.pageIndex=1 
 ```
 ### 参数如下
   *  :pageIndex：页码 （必选）
