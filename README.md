@@ -35,7 +35,7 @@ export default {
         return {
             pageIndex: 1,
             pageSize: 10,
-            totalCount: -1 //默认给-1
+            totalCount: 0
         }
     },
     methods:{
