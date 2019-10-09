@@ -1,25 +1,21 @@
 <template>
-  <div id="loadContainer" style="position:relative;overflow-y:hidden;">
-    <div id="loadMore" @touchstart="touchstart($event)" @touchmove="touchmove($event)" @touchend="touchend($event)">
-      <div class="pull-wrap" v-if="openRefresh||openRefresh=='true'"  style="margin-top:-40px;">
-        <i class="loadmore-icon" v-if="state==3"></i>
-        <i :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i>
-        <span class="pull-text">下拉刷新</span>
-      </div>
-      <slot></slot>
-      <div class="loadmore-tip" id="loadTips" v-if="totalCount > 0 && totalCount >= pageSize">
-        <i v-show="loadTips=='正在加载中'" class="loadmore-icon"></i>
-        {{loadTips}}
-      </div>
-      <div v-if="hasData" class="no-data-tip">
-        <img :src="tipsSrc">
-        <p>{{tips}}</p>
-      </div>
+  <div id="loadMore" class="loadmore" @touchstart="touchstart($event)" @touchmove="touchmove($event)" @touchend="touchend($event)">
+    <div class="pull-wrap">
+        <div v-show="openRefresh">
+          <transition  name="fade"><i class="loadmore-icon" v-if="state==3&&refreshTips" ></i></transition>
+          <transition  name="fade"><i v-show="refreshTips" :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i></transition>
+          <transition  name="fade"><span v-if="refreshTips" class="pull-text">{{refreshTips}}</span></transition>
+        </div>
+    </div>
+    <slot></slot>
+    <div class="loadmore-tip" id="loadTips" v-if="totalCount > 0 && totalCount >= pageSize">
+      <i v-show="loadTips=='正在加载中'" class="loadmore-icon"></i>
+      {{loadTips}}
     </div>
   </div>
 </template>
 <script>
-var clr, clr2 ,clr3,clr4;
+var clr, clr2 ,clr3;
 export default {
   props: {
     pageIndex: {
@@ -34,24 +30,20 @@ export default {
       type: [Number, String],
       default: "0"
     },
-    tipsSrc: {
-      type: [String],
-      default: "https://file.40017.cn/tcyp/tz/no_data.png"
-    },
     tips: {
       type: [String],
       default: "暂无数据"
     },
     openRefresh: {
-      type: [String, Boolean],
+      type: [Boolean],
       default: false
     }
   },
   data() {
     return {
-      hasData: false,
-      isPull: false,//是否达到了松开坑新的临界点
-      state: 1,//1:下拉刷新，2：松开更新，3：更新中
+      isPull: false,//是否达到了松开刷新的临界点
+      state: 1,//1:下拉刷新，2：松开刷新，3：更新中
+      refreshTips:'',
       loadTips: "正在加载中"
     };
   },
@@ -61,11 +53,8 @@ export default {
     },
     totalCount:{
       handler(val, oldval) {
-        this.hasData = false;
-        if (val > 0) {
+       if (val > 0) {
           this.loadMore();
-        } else if (val == 0) {
-          this.hasData = true;
         }
       },
       immediate: true
@@ -80,26 +69,17 @@ export default {
       let pageSize = this.pageSize;
       let pageIndex = this.pageIndex;
       let totalCount = this.totalCount;
-
+      // console.log(pageSize,pageIndex,totalCount)
       return new Promise(function(resolve, reject) {
         window.onscroll = function() {
           clr = setTimeout(() => {
-            let scrollHeight =
-              document.documentElement.scrollHeight ||
-              document.body.scrollHeight;
-            let scrollTop =
-              document.documentElement.scrollTop || document.body.scrollTop;
-            let clientHeight =
-              document.documentElement.clientHeight ||
-              document.body.clientHeight;
-
+            let scrollHeight =  document.documentElement.scrollHeight || document.body.scrollHeight;
+            let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+            let clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
             if (!document.getElementById("loadTips")) {
               return;
             }
-            let rectBottom =
-              document.getElementById("loadTips").getBoundingClientRect()
-                .bottom | 0;
-
+            let rectBottom = document.getElementById("loadTips").getBoundingClientRect().bottom | 0;
             //if (scrollTop + clientHeight >= scrollHeight - 25) {
             if (rectBottom < clientHeight + 25) {
               if (flag) {
@@ -115,78 +95,65 @@ export default {
                 clearTimeout(clr);
               }
             }
-          }, 600);
+          }, 400);
         };
       });
     },
     //下拉刷新
     refresh() {
-        this._refreshText = document.querySelector(".pull-text"),
-        this._startPos = 0,
+        this._startPos = 0
         this._transitionHeight = 0
         this.obj = document.getElementById("loadMore")
-        this.loadContainerTop = document.getElementById("loadContainer").offsetTop
-        this.windowHeight = document.documentElement.clientHeight||document.body.clientHeight
+        this.objTop = this.obj.offsetTop
     },
     touchstart(event){
-      if (!this.openRefresh&&this.openRefresh!="true") {
+      if (!this.openRefresh) {
         return;
       }
-      this.loadContainer = document.getElementById("loadContainer")
-      this.loadContainerHeight = this.loadContainer.offsetHeight
       this._startPos = event.targetTouches[0].screenY
       this.obj.style.transition = "transform 0s linear"
     },
     touchmove(event){
-      if (!this.openRefresh&&this.openRefresh!="true") {
+      if (!this.openRefresh) {
         return;
       }
-      var h = Math.ceil(this.obj.getBoundingClientRect().top + 40)
+      var h = Math.ceil(this.obj.getBoundingClientRect().top)
       this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.3) | 0
-      if (h>=this.loadContainerTop&&this._transitionHeight >= 0) {
+      if (h>=this.objTop&&this._transitionHeight >= 0) {
         if (typeof event.cancelable !== 'boolean' || event.cancelable) {
           event.preventDefault();
         }
-        
-        if(this.loadContainerHeight<=this.windowHeight){
-          let temph = this.loadContainerHeight+this._transitionHeight
-          this.loadContainer.style.height = temph + 'px'
-        }
-
         this.obj.style.transform = "translateY(" + this._transitionHeight + "px)"
         if (this._transitionHeight > 0 && this._transitionHeight < 100) {
           this.state = 1;
-          this._refreshText.innerText = "下拉刷新";
+          this.refreshTips = "下拉刷新";
           this.isPull = false;
           if (this._transitionHeight > 50) {
             this.state = 2;
-            this._refreshText.innerText = "松开更新";
+            this.refreshTips = "松开更新";
             this.isPull = true;
           }
         }
       }
     },
     touchend(event){
-      if (!this.openRefresh&&this.openRefresh!="true") {
+      if (!this.openRefresh) {
         return;
       }
       this.obj.style.cssText = `transition:transform 0.3s ease 0.1s;transform:translateY(0);`
-      clearTimeout(clr4)
-      clr4 = setTimeout(()=>{
-        this.loadContainer.style.height = "auto"
-      },1500)
       if (this.isPull) {
         var h = Math.ceil(this.obj.getBoundingClientRect().top + 40)
         this._transitionHeight = event.changedTouches[0].screenY - this._startPos;
-        if (h>=this.loadContainerTop&&this._transitionHeight >= 0) {
+        if (h>=this.objTop&&this._transitionHeight >= 0) {
           this.state = 3;
-          this._refreshText.innerText = "正在刷新中";
+          this.refreshTips = "正在刷新中";
           this.obj.style.transform = "translateY(40px)";
           clr2 = setTimeout(()=> {
             this.obj.style.transform = "translateY(0)";
             clearTimeout(clr2);
           }, 1000);
           clr3 = setTimeout(()=> {
+            this.refreshTips=''
             this.$emit("refresh", true);
           }, 1500);
         } else {
@@ -194,7 +161,11 @@ export default {
             this.obj.style.transform = "translateY(0)"
         }
       }else{
-        this.obj.style.transform = "translateY(0)"
+        clr2 = setTimeout(()=> {
+          this.state = 1;
+          this.refreshTips = ''
+          clearTimeout(clr2);
+        }, 400);
       }
     }
   },
@@ -202,11 +173,10 @@ export default {
     clearTimeout(clr);
     clearTimeout(clr2);
     clearTimeout(clr3);
-    clearTimeout(clr4);
   },
   mounted() {
     //this.loadMore()
-    if (this.openRefresh == true || this.openRefresh == "true") {
+    if (this.openRefresh) {
       this.$nextTick(()=>{
         this.refresh()
       })
@@ -215,6 +185,16 @@ export default {
 };
 </script>
 <style scoped>
+.loadmore{
+  margin-top:-40px;
+}
+.fade-enter-active,.fade-leave-active {
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
 .loadmore-tip {
   color: #aaa;
   font-size: 14px;
@@ -223,6 +203,8 @@ export default {
   line-height: 50px;
 }
 .pull-wrap {
+  height:40px;
+  line-height: 40px;
   text-align: center;
   width:100%;
 }
@@ -273,7 +255,6 @@ export default {
   -webkit-animation: rotate-loading 0.6s linear forwards infinite;
   animation: rotate-loading 0.6s linear forwards infinite;
 }
-
 .pull-text {
   text-align: center;
   color: #aaa;

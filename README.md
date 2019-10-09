@@ -35,12 +35,13 @@ export default {
         return {
             pageIndex: 1,
             pageSize: 10,
-            totalCount: -1 //默认给-1
+            totalCount: 0
         }
     },
     methods:{
         loadmore(pageIndex){
-            //上滑加载更多，pageIndex为下一页页码
+            //上滑加载更多，pageIndex为下一页页码,
+            this.pageIndex = pageIndex
             console.log('加载更多中...')
         },
         refresh(){
@@ -52,14 +53,12 @@ export default {
 
 ```
 ```diff
-- 注意：当含有上图gif中tab切换或者筛选功能时，请初始化this.totalCount=-1;this.pageIndex=1 
+- 注意：当含有上图gif中tab切换或者筛选功能时，请初始化this.totalCount=0;this.pageIndex=1 
 ```
 ### 参数如下
   *  :pageIndex：页码 （必选）
   *  :pageSize：页的大小（必选）
   *  :totalCount：总条数（必选）
-  *  :tips：当没有数据时提供的文本（默认值：暂无数据）
-  *  :tipsSrc：当没有数据时提供的图标（默认自带），必须是在线地址图标
   *  :openRefresh：true，默认false，只有开启以后才能启动下拉刷新* 
  
 ### 回调函数
