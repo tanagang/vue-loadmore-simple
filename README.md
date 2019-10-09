@@ -10,7 +10,7 @@
 首先项目中安装：npm install vue-loadmore-simple -S
 ```javascript
 //main.js
-import {LoadMore} from 'vue-loadmore-simple'
+import LoadMore from 'vue-loadmore-simple'
 Vue.use(LoadMore)
 //template
 <template>
