@@ -41,7 +41,6 @@ export default {
   },
   data() {
     return {
-      isShow:false,//显示下拉状态文本
       isPull: false,//是否达到了松开刷新的临界点
       state: 1,//1:下拉刷新，2：松开刷新，3：更新中
       refreshTips:'',
