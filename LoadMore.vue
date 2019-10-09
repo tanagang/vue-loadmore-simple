@@ -1,9 +1,11 @@
 <template>
   <div id="loadMore" class="loadmore" @touchstart="touchstart($event)" @touchmove="touchmove($event)" @touchend="touchend($event)">
-    <div class="pull-wrap" v-if="openRefresh||openRefresh=='true'">
-      <i class="loadmore-icon" v-show="state==3&&refreshTips"></i>
-      <i v-show="refreshTips" :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i>
-      <span class="pull-text">{{refreshTips}}</span>
+    <div class="pull-wrap">
+        <div v-show="openRefresh">
+          <transition  name="fade"><i class="loadmore-icon" v-if="state==3&&refreshTips" ></i></transition>
+          <transition  name="fade"><i v-show="refreshTips" :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i></transition>
+          <transition  name="fade"><span v-if="refreshTips" class="pull-text">{{refreshTips}}</span></transition>
+        </div>
     </div>
     <slot></slot>
     <div class="loadmore-tip" id="loadTips" v-if="totalCount > 0 && totalCount >= pageSize">
@@ -28,23 +30,20 @@ export default {
       type: [Number, String],
       default: "0"
     },
-    tipsSrc: {
-      type: [String],
-      default: "https://file.40017.cn/tcyp/tz/no_data.png"
-    },
     tips: {
       type: [String],
       default: "暂无数据"
     },
     openRefresh: {
-      type: [String, Boolean],
+      type: [Boolean],
       default: false
     }
   },
   data() {
     return {
-      isPull: false,//是否达到了松开坑新的临界点
-      state: 1,//1:下拉刷新，2：松开更新，3：更新中
+      isShow:false,//显示下拉状态文本
+      isPull: false,//是否达到了松开刷新的临界点
+      state: 1,//1:下拉刷新，2：松开刷新，3：更新中
       refreshTips:'',
       loadTips: "正在加载中"
     };
@@ -71,7 +70,6 @@ export default {
       let pageSize = this.pageSize;
       let pageIndex = this.pageIndex;
       let totalCount = this.totalCount;
-
       // console.log(pageSize,pageIndex,totalCount)
       return new Promise(function(resolve, reject) {
         window.onscroll = function() {
@@ -79,7 +77,6 @@ export default {
             let scrollHeight =  document.documentElement.scrollHeight || document.body.scrollHeight;
             let scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
             let clientHeight = document.documentElement.clientHeight || document.body.clientHeight;
-
             if (!document.getElementById("loadTips")) {
               return;
             }
@@ -111,14 +108,14 @@ export default {
         this.objTop = this.obj.offsetTop
     },
     touchstart(event){
-      if (!this.openRefresh&&this.openRefresh!="true") {
+      if (!this.openRefresh) {
         return;
       }
       this._startPos = event.targetTouches[0].screenY
       this.obj.style.transition = "transform 0s linear"
     },
     touchmove(event){
-      if (!this.openRefresh&&this.openRefresh!="true") {
+      if (!this.openRefresh) {
         return;
       }
       var h = Math.ceil(this.obj.getBoundingClientRect().top)
@@ -141,7 +138,7 @@ export default {
       }
     },
     touchend(event){
-      if (!this.openRefresh&&this.openRefresh!="true") {
+      if (!this.openRefresh) {
         return;
       }
       this.obj.style.cssText = `transition:transform 0.3s ease 0.1s;transform:translateY(0);`
@@ -164,6 +161,12 @@ export default {
             this.state = 1;
             this.obj.style.transform = "translateY(0)"
         }
+      }else{
+        clr2 = setTimeout(()=> {
+          this.state = 1;
+          this.refreshTips = ''
+          clearTimeout(clr2);
+        }, 400);
       }
     }
   },
@@ -174,7 +177,7 @@ export default {
   },
   mounted() {
     //this.loadMore()
-    if (this.openRefresh == true || this.openRefresh == "true") {
+    if (this.openRefresh) {
       this.$nextTick(()=>{
         this.refresh()
       })
@@ -185,6 +188,13 @@ export default {
 <style scoped>
 .loadmore{
   margin-top:-40px;
+}
+.fade-enter-active,.fade-leave-active {
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 }
 .loadmore-tip {
   color: #aaa;
@@ -246,7 +256,6 @@ export default {
   -webkit-animation: rotate-loading 0.6s linear forwards infinite;
   animation: rotate-loading 0.6s linear forwards infinite;
 }
-
 .pull-text {
   text-align: center;
   color: #aaa;
