@@ -1,6 +1,6 @@
 [![issues](https://img.shields.io/github/issues/tanagang/vue-loadmore-simple)](https://github.com/tanagang/vue-loadmore-simple/issues)
-[![forks](https://img.shields.io/github/forks/tanagang/vue-loadmore-simple)](https://github.com/tanagang/vue-loadmore-simple)
-[![stars](https://img.shields.io/github/stars/tanagang/vue-loadmore-simplep)](https://github.com/tanagang/vue-loadmore-simple)
+[![forks](https://img.shields.io/github/forks/tanagang/vue-loadmore-simple)](https://github.com/tanagang/vue-loadmore-simple/network/members)
+[![stars](https://img.shields.io/github/stars/tanagang/vue-loadmore-simplep)](https://github.com/tanagang/vue-loadmore-simple/stargazers)
 [![npm](https://img.shields.io/npm/v/vue-loadmore-simple)](https://www.npmjs.com/package/vue-loadmore-simple)
 [![downloads](https://img.shields.io/npm/dm/vue-loadmore-simple.svg)](https://www.npmjs.com/package/vue-loadmore-simple)
 [![npm bundle size](https://img.shields.io/bundlephobia/minzip/vue-loadmore-simple)](https://www.npmjs.com/package/vue-loadmore-simple)
