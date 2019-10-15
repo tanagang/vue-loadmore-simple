@@ -1,4 +1,13 @@
-﻿基于vue开箱即用的全局组件上滑无限滚动加载更多、下拉刷新  
+[![issues](https://img.shields.io/github/issues/tanagang/vue-loadmore-simple)](https://github.com/tanagang/vue-loadmore-simple/issues)
+[![forks](https://img.shields.io/github/forks/tanagang/vue-loadmore-simple)](https://github.com/tanagang/vue-loadmore-simple)
+[![stars](https://img.shields.io/github/stars/tanagang/vue-loadmore-simplep)](https://github.com/tanagang/vue-loadmore-simple)
+[![npm](https://img.shields.io/npm/v/vue-loadmore-simple)](https://www.npmjs.com/package/vue-loadmore-simple)
+[![downloads](https://img.shields.io/npm/dm/vue-loadmore-simple.svg)](https://www.npmjs.com/package/vue-loadmore-simple)
+[![npm bundle size](https://img.shields.io/bundlephobia/minzip/vue-loadmore-simple)](https://www.npmjs.com/package/vue-loadmore-simple)
+![github last commit](https://img.shields.io/github/last-commit/tanagang/vue-loadmore-simple)
+
+
+基于vue开箱即用的全局组件上滑无限滚动加载更多、下拉刷新  
 下图gif可能有卡顿，[图片原地址](https://file.40017.cn/tcyp/tz/refresh2.gif)  
 ```diff
 + 若适用就来个star吧
