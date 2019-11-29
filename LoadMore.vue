@@ -154,6 +154,7 @@ export default {
           }, 1000);
           clr3 = setTimeout(()=> {
             this.refreshTips=''
+            this.isPull = false
             this.$emit("refresh", true);
           }, 1500);
         } else {
