@@ -30,10 +30,6 @@ export default {
       type: [Number, String],
       default: "0"
     },
-    tips: {
-      type: [String],
-      default: "暂无数据"
-    },
     openRefresh: {
       type: [Boolean],
       default: false
