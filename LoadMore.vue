@@ -2,7 +2,7 @@
   <div id="loadMore" class="loadmore" @touchstart="touchstart($event)" @touchmove="touchmove($event)" @touchend="touchend($event)">
     <div class="pull-wrap">
         <div v-show="openRefresh">
-          <transition  name="fade"><i class="loadmore-icon" v-if="state==3&&refreshTips"></i></transition>
+          <transition  name="fade"><i class="loadmore-icon" v-if="state==3&&refreshTips" ></i></transition>
           <transition  name="fade"><i v-show="refreshTips" :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i></transition>
           <transition  name="fade"><span v-if="refreshTips" class="pull-text">{{refreshTips}}</span></transition>
         </div>
@@ -29,6 +29,10 @@ export default {
     totalCount: {
       type: [Number, String],
       default: "0"
+    },
+    tips: {
+      type: [String],
+      default: "暂无数据"
     },
     openRefresh: {
       type: [Boolean],
@@ -114,7 +118,7 @@ export default {
         return;
       }
       var h = Math.ceil(this.obj.getBoundingClientRect().top)
-      this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.4) | 0
+      this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.3) | 0
       if (h>=this.objTop&&this._transitionHeight >= 0) {
         if (typeof event.cancelable !== 'boolean' || event.cancelable) {
           event.preventDefault();
@@ -136,7 +140,7 @@ export default {
       if (!this.openRefresh) {
         return;
       }
-      this.obj.style.cssText = `transition:transform 0.2s ease-out;transform:translateY(0);`
+      this.obj.style.cssText = `transition:transform 0.2s ease 0.2s;transform:translateY(0);`
       if (this.isPull) {
         var h = Math.ceil(this.obj.getBoundingClientRect().top + 40)
         this._transitionHeight = event.changedTouches[0].screenY - this._startPos;
@@ -150,7 +154,7 @@ export default {
           }, 1000);
           clr3 = setTimeout(()=> {
             this.refreshTips=''
-            this.isPull = false
+            this.isPull = false;
             this.$emit("refresh", true);
           }, 1500);
         } else {
@@ -186,14 +190,14 @@ export default {
   margin-top:-40px;
 }
 .fade-enter-active,.fade-leave-active {
-  -webkit-transition: all 0.2s ease;
-  transition: all 0.2s ease;
+    -webkit-transition: all 0.2s ease;
+    transition: all 0.2s ease;
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
 }
 .loadmore-tip {
-  color: #999;
+  color: #aaa;
   font-size: 14px;
   text-align: center;
   height: 50px;
@@ -205,7 +209,22 @@ export default {
   text-align: center;
   width:100%;
 }
-
+.no-data-tip {
+  text-align: center;
+  padding-top: 36%;
+}
+.no-data-tip p {
+  font-size: 16px;
+  margin: 10px auto;
+  color: #aaa;
+  padding: 0;
+}
+.no-data-tip img {
+  display: block;
+  margin: 0 auto;
+  width: auto;
+  max-width: 150px;
+}
 @keyframes rotate-loading {
   0% {
     -webkit-transform: rotate(0);
@@ -239,24 +258,22 @@ export default {
 }
 .pull-text {
   text-align: center;
-  color: #999;
+  color: #aaa;
   height: 40px;
   font-size:14px;
   line-height: 40px;
 }
 .pull-arrow {
-  vertical-align: -4px;
+  vertical-align: -6px;
   height: 18px;
   width: 14px;
   display: inline-block;
-  background: url("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADcAAABMCAYAAADJPi9EAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAyJpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMy1jMDExIDY2LjE0NTY2MSwgMjAxMi8wMi8wNi0xNDo1NjoyNyAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RSZWY9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZVJlZiMiIHhtcDpDcmVhdG9yVG9vbD0iQWRvYmUgUGhvdG9zaG9wIENTNiAoV2luZG93cykiIHhtcE1NOkluc3RhbmNlSUQ9InhtcC5paWQ6QzIwQ0ZDMDcwRjUwMTFFQThDMEVGMTg1QzRDMDZEREIiIHhtcE1NOkRvY3VtZW50SUQ9InhtcC5kaWQ6QzIwQ0ZDMDgwRjUwMTFFQThDMEVGMTg1QzRDMDZEREIiPiA8eG1wTU06RGVyaXZlZEZyb20gc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDpDMjA4REQ1MDBGNTAxMUVBOEMwRUYxODVDNEMwNkREQiIgc3RSZWY6ZG9jdW1lbnRJRD0ieG1wLmRpZDpDMjA4REQ1MTBGNTAxMUVBOEMwRUYxODVDNEMwNkREQiIvPiA8L3JkZjpEZXNjcmlwdGlvbj4gPC9yZGY6UkRGPiA8L3g6eG1wbWV0YT4gPD94cGFja2V0IGVuZD0iciI/Ps/hVj8AAAR4SURBVHja7JtNTxNBGMd3l/Ia44ELXPTm1e+B0SqGRAySaKAx8eTNxEQvHjRe0As02AQFNHogoph4Np6I38H4AYQSXspLW+r/aXaaYZjZmW13y26dSZ60u8zszm//8zwz83Rxa7Wa06nFczq4WDgLl8CSEU/k83mHgozruqEuRG344ETt+Wvgb1dxfM8/fIvva6wdX46Pjxvt2N88zzO6fyaTcXK5nBoupnIfHc5zxzdhD2BzbVUuDjAaEJInPet/nUurz0nBuDLr10kdXE4D1nDzuABjgYN/TcHmQzSJBTBSOD/KElihieaRA3oxKFZo4RJ5tJ9OHBw6lcN8pAKrigqjblk2l+LcG7pWkuDuwuYV0C9hT07cFJPy0dHR02q1+lyxWKBrTScBjsAWFGDfYY+g1F/+fFdXl7O3t1eEPWYrFYWCU2cJpwQD0Dd07oq/hLooqXKhVCo5lUolizoqwEIrgF4cYFgfrmHIXePWmxWxDtSrHB4e0vCkwyzafFUB+vdqG1yQYgSWNQhA9U9Sz38A12GriuoLzQA2AzcZBEbDTFzVqwr53sHBgUMK0neU0SgBw8LdgS3qwPxQb7xtIvU4NSMD9EKCLZkoRp8EZ5J8kqgXGaDXKhgFD3EohlGNPQxMC+JpHeBkFHATAYp9AVyWBwmjGq8eDc39/f36btoQcNF/6E3D3YYtK/62CpAbkmVV6BQFK7u7u7LTQYBLQYCeBuyDCsy/6anhFVa1RkoAiinUaxrQiwqsVdU06jHAzypA3H/CBG4EHVSCAWBUsY8LUs2NQD2WWFpRNF/GvUd0cLOK4CFVjF/pt6qagXrUjzHYiuz+CG4zOrjzMjDYaFAo1/haTaxP+clyuUwL5xNGZXt729nZ2eHnvVOACgXPBab20PAZbj7DdeQTPsaDggRTLaDOCUkJor+/3xkaGjqlNh1jber09PToUhpjuO9HfN7iHtgLHdwrNKJxcRmVf6HRknaybDJCqvIwpBhbsfjDTVqvu7t7HA9iHQ/rEuqso6/vAuH8UjDxHxYhTfosBg4aehsbG9RBR7HyqQ/bwcFB3epmhvpBaovXainjLP4eEEYdeijUGUVUrBfyu4GBgfoQZv6o20LFnreMMOkUGDnbmtqLuhjMe+mFE+e9sC6QeDimHplq3ku1crpVS6rhSD3yu7C+l6rfxEm9MD9pG8Ox5ZVstdDuyGnqe6l7m4FyLabqhYKLakvTqu8JmbLOUY73vUjgml1Dxq2eLnKm9g0ik3kvlXB8npN2FqohqoUTX3tKym6BbHNzs74VUgUXL8nRMaiQYjQ0t7a2lBveTFp9zk8zNBJJtKkVswKZoMZJLyyLViwW6ykJLVyUyZ52FNZfUlDsd2qHpaigLKjY14AtnIWzcBbOwlk4C2fhLJyF+9/h2rXlcSWbYZc2mnHuHdsF1yvZZPaytxXSDvebP6CMVV9f35/h4eGO8Ln3sB/c8U/YIkvRRWlnoRy9xDwF/3pI/oeh+BrfS3Hnalz7T/AWLnnlnwADAJpuWXrR2Wc8AAAAAElFTkSuQmCC")
+  background: url("data:image/svg+xml;utf8;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iaXNvLTg4NTktMSI/Pg0KPCEtLSBHZW5lcmF0b3I6IEFkb2JlIElsbHVzdHJhdG9yIDE4LjEuMSwgU1ZHIEV4cG9ydCBQbHVnLUluIC4gU1ZHIFZlcnNpb246IDYuMDAgQnVpbGQgMCkgIC0tPg0KPHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJDYXBhXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4Ig0KCSB2aWV3Qm94PSIwIDAgMjAxLjg5NCAyMDEuODk0IiBzdHlsZT0iZW5hYmxlLWJhY2tncm91bmQ6bmV3IDAgMCAyMDEuODk0IDIwMS44OTQ7IiB4bWw6c3BhY2U9InByZXNlcnZlIj4NCjxnPg0KCTxnPg0KCQk8cG9seWdvbiBzdHlsZT0iZmlsbDojMDEwMDAyOyIgcG9pbnRzPSIzMy43NjgsNjYuMDE5IDM5LjEwOCw3MS4yNjYgOTcuMTcxLDE0LjIwNCA5Ny4xNzEsMjAxLjg5NCAxMDQuNzE5LDIwMS44OTQgDQoJCQkxMDQuNzE5LDE0LjE5NCAxNjIuNzg2LDcxLjI2NiAxNjguMTI1LDY2LjAxOSAxMDAuOTQ3LDAgCQkiLz4NCgk8L2c+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8Zz4NCjwvZz4NCjxnPg0KPC9nPg0KPGc+DQo8L2c+DQo8L3N2Zz4NCg==")
     no-repeat;
-  background-size:14px 18px;
-  -webkit-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 .pull-toggle {
-  -webkit-transform: rotate(180deg);
+  vertical-align: -2px;
   transform: rotate(180deg);
 }
 </style>
