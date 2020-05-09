@@ -2,9 +2,11 @@
   <div id="loadMore" class="loadmore" @touchstart="touchstart($event)" @touchmove="touchmove($event)" @touchend="touchend($event)">
     <div class="pull-wrap">
         <div v-show="openRefresh">
-          <transition  name="fade"><i class="loadmore-icon" v-if="state==3&&refreshTips" ></i></transition>
-          <transition  name="fade"><i v-show="refreshTips" :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i></transition>
-          <transition  name="fade"><span v-if="refreshTips" class="pull-text">{{refreshTips}}</span></transition>
+          <transition-group name="fade">
+            <i v-show="state==3&&refreshTips"  key="1"  class="loadmore-icon"></i>
+            <i v-show="refreshTips" key="2" :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i>
+            <span v-if="refreshTips" key="3" class="pull-text">{{refreshTips}}</span>
+          </transition-group>
         </div>
     </div>
     <slot></slot>
@@ -107,44 +109,37 @@ export default {
         this.objTop = this.obj.offsetTop
     },
     touchstart(event){
-      if (!this.openRefresh) {
-        return;
-      }
+      if (!this.openRefresh) return
       this._startPos = event.targetTouches[0].screenY
       this.obj.style.transition = "transform 0s linear"
     },
     touchmove(event){
-      if (!this.openRefresh) {
-        return;
-      }
       var h = Math.ceil(this.obj.getBoundingClientRect().top)
-      this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.3) | 0
-      if (h>=this.objTop&&this._transitionHeight >= 0) {
-        if (typeof event.cancelable !== 'boolean' || event.cancelable) {
+      this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.2) | 0
+     
+      if (h>=this.objTop) {
+         if (typeof event.cancelable !== 'boolean' || event.cancelable) {
           event.preventDefault();
         }
         this.obj.style.transform = "translateY(" + this._transitionHeight + "px)"
         if (this._transitionHeight > 0 && this._transitionHeight < 100) {
-          this.state = 1;
-          this.refreshTips = "下拉刷新";
-          this.isPull = false;
+          this.state = 1
+          this.isPull = false
+          this.refreshTips = "下拉刷新"
           if (this._transitionHeight > 50) {
-            this.state = 2;
+            this.state = 2
+            this.isPull = true
             this.refreshTips = "松开更新";
-            this.isPull = true;
           }
         }
       }
     },
     touchend(event){
-      if (!this.openRefresh) {
-        return;
-      }
-      this.obj.style.cssText = `transition:transform 0.2s ease 0.2s;transform:translateY(0);`
+      this.obj.style.cssText = `transition:transform 0.2s ease;transform:translateY(0);`
       if (this.isPull) {
         var h = Math.ceil(this.obj.getBoundingClientRect().top + 40)
         this._transitionHeight = event.changedTouches[0].screenY - this._startPos;
-        if (h>=this.objTop&&this._transitionHeight >= 0) {
+        if (h>=this.objTop) {
           this.state = 3;
           this.refreshTips = "正在刷新中";
           this.obj.style.transform = "translateY(40px)";
@@ -153,7 +148,6 @@ export default {
             clearTimeout(clr2);
           }, 1000);
           clr3 = setTimeout(()=> {
-            this.refreshTips=''
             this.isPull = false;
             this.$emit("refresh", true);
           }, 1500);
@@ -164,7 +158,6 @@ export default {
       }else{
         clr2 = setTimeout(()=> {
           this.state = 1;
-          this.refreshTips = ''
           clearTimeout(clr2);
         }, 400);
       }
@@ -262,6 +255,7 @@ export default {
   height: 40px;
   font-size:14px;
   line-height: 40px;
+  margin-left:4px;
 }
 .pull-arrow {
   vertical-align: -6px;
