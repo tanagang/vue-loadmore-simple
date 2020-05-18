@@ -116,7 +116,7 @@ export default {
     },
     touchmove(event){
       var h = Math.ceil(this.obj.getBoundingClientRect().top)
-      this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.2) | 0
+      this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.3) | 0
      
       if (h>=this.objTop) {
          if (typeof event.cancelable !== 'boolean' || event.cancelable) {
@@ -188,7 +188,7 @@ export default {
   opacity: 0;
 }
 .loadmore-tip {
-  color: #aaa;
+  color: #999;
   font-size: 14px;
   text-align: center;
   height: 50px;
@@ -249,7 +249,7 @@ export default {
 }
 .pull-text {
   text-align: center;
-  color: #aaa;
+  color: #999;
   height: 40px;
   font-size:14px;
   line-height: 40px;
