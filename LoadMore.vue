@@ -2,17 +2,18 @@
   <div id="loadMore" class="loadmore" @touchstart="touchstart($event)" @touchmove="touchmove($event)" @touchend="touchend($event)">
     <div class="pull-wrap">
         <div v-show="openRefresh">
-          <transition-group name="fade">
-            <i v-show="state==3&&refreshTips"  key="1"  class="loadmore-icon"></i>
-            <i v-show="refreshTips" key="2" :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i>
-            <span v-if="refreshTips" key="3" class="pull-text">{{refreshTips}}</span>
-          </transition-group>
+          <transition name="fade">
+            <div>
+              <i v-if="state==3&&refreshTips"  key="1"  class="loadmore-icon"></i>
+              <i v-else-if="refreshTips" key="2" :class="state==1 ? 'pull-arrow pull-toggle': state==2?'pull-arrow':''"></i>
+              <span v-if="refreshTips" key="3" class="pull-text">{{refreshTips}}</span>
+            </div>
+          </transition>
         </div>
     </div>
     <slot></slot>
     <div class="loadmore-tip" id="loadTips" v-if="totalCount > 0 && totalCount >= pageSize">
-      <i v-show="loadTips=='正在加载中'" class="loadmore-icon"></i>
-      {{loadTips}}
+      <i v-show="loadTips=='正在加载中'" class="loadmore-icon"></i>{{loadTips}}
     </div>
   </div>
 </template>
@@ -151,9 +152,6 @@ export default {
             this.isPull = false;
             this.$emit("refresh", true);
           }, 1500);
-        } else {
-            this.state = 1;
-            this.obj.style.transform = "translateY(0)"
         }
       }else{
         clr2 = setTimeout(()=> {
@@ -268,6 +266,7 @@ export default {
 }
 .pull-toggle {
   vertical-align: -2px;
+  -webkit-transform: rotate(180deg);
   transform: rotate(180deg);
 }
 </style>
