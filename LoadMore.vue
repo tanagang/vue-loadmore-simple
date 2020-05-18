@@ -136,7 +136,7 @@ export default {
       }
     },
     touchend(event){
-      this.obj.style.cssText = `transition:transform 0.2s ease;transform:translateY(0);`
+      this.obj.style.cssText = `transition:transform 0.2s cubic-bezier(0,.2,.5,.7);transform:translateY(0);`
       if (this.isPull) {
         var h = Math.ceil(this.obj.getBoundingClientRect().top + 40)
         this._transitionHeight = event.changedTouches[0].screenY - this._startPos;
