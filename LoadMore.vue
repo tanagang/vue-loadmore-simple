@@ -115,6 +115,7 @@ export default {
       this.obj.style.transition = "transform 0s linear"
     },
     touchmove(event){
+      if (!this.openRefresh) return
       var h = Math.ceil(this.obj.getBoundingClientRect().top)
       this._transitionHeight =((event.targetTouches[0].screenY - this._startPos) * 0.3) | 0
      
@@ -136,6 +137,7 @@ export default {
       }
     },
     touchend(event){
+      if (!this.openRefresh) return
       this.obj.style.cssText = `transition:transform 0.2s cubic-bezier(0,.2,.5,.7);transform:translateY(0);`
       if (this.isPull) {
         var h = Math.ceil(this.obj.getBoundingClientRect().top + 40)
@@ -149,6 +151,7 @@ export default {
             clearTimeout(clr2);
           }, 1000);
           clr3 = setTimeout(()=> {
+            clearTimeout(clr2);
             this.isPull = false;
             this.$emit("refresh", true);
           }, 1500);
@@ -167,7 +170,6 @@ export default {
     clearTimeout(clr3);
   },
   mounted() {
-    //this.loadMore()
     if (this.openRefresh) {
       this.$nextTick(()=>{
         this.refresh()
